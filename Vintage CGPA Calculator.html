@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Vintage CGPA Calculator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Special+Elite&family=VT323&display=swap" rel="stylesheet">
+  <style>
+:root{
+  --body:#d9cdb0; --body-dark:#b9ab88; --brown:#4a3426; --cream:#f1e8d0;
+  --orange:#d8682a; --red:#b3332b; --lcd-bg:#a8b88a; --lcd-ink:#1f2a14;
+  --paper:#fbf7ea; --ink:#2b2118;
+}
+*{box-sizing:border-box}
+html{color-scheme:light}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{
+  margin:0; min-height:100vh; padding:24px 12px 48px;
+  background:
+    radial-gradient(circle at 20% 10%, #6b4f3a 0, transparent 60%),
+    repeating-linear-gradient(45deg,#3b2a1e 0 6px,#35261b 6px 12px);
+  font-family:'Special Elite',monospace; color:var(--ink);
+}
+.calc{
+  max-width:760px; margin:0 auto; padding:22px 22px 18px;
+  background:linear-gradient(160deg,var(--body),var(--body-dark));
+  border-radius:28px 28px 40px 40px;
+  border:3px solid #8f8160;
+  box-shadow:0 2px 0 #fff6 inset,0 -6px 0 #0003 inset,0 30px 60px #000a,0 0 0 8px #2a1d14;
+}
+.brand{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:14px}
+.logo{font-family:'Orbitron',sans-serif; font-weight:700; font-size:22px; letter-spacing:2px; color:var(--brown);
+  border:2px solid var(--brown); padding:2px 10px; border-radius:4px}
+.tagline{font-size:13px; color:#5b4a36; flex:1; min-width:180px}
+.solar{display:flex; gap:3px; background:#2b1f17; padding:5px; border-radius:4px; border:2px solid #111}
+.solar i{display:block; width:20px; height:16px; background:linear-gradient(#5a3a2a,#2a1810); border-radius:2px}
+
+.lcd{
+  background:var(--lcd-bg); color:var(--lcd-ink); border-radius:10px; padding:10px 16px 12px;
+  border:5px solid #5d5640; box-shadow:inset 0 4px 12px #0006, 0 2px 0 #fff8;
+  font-family:'VT323',monospace; text-shadow:1px 1px 0 #ffffff30;
+  background-image:repeating-linear-gradient(0deg,#0000 0 2px,#0000000d 2px 3px);
+}
+.lcd-top{display:flex; justify-content:space-between; font-size:20px; opacity:.7}
+.lcd-main{display:block; text-align:right; font-size:84px; line-height:1; letter-spacing:3px; overflow:hidden}
+.lcd-stats{display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; font-size:22px; margin-top:4px}
+.lcd-stats b{font-weight:400}
+
+.keys{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:16px 0}
+.key{
+  font-family:'Orbitron',sans-serif; font-weight:700; font-size:12px; letter-spacing:1px;
+  padding:14px 6px; border:none; border-radius:10px; cursor:pointer;
+  background:linear-gradient(#6a4e3a,var(--brown)); color:var(--cream);
+  box-shadow:0 5px 0 #20140c, 0 8px 8px #0005, inset 0 1px 0 #fff3;
+  transition:transform .06s, box-shadow .06s;
+}
+.key:active{transform:translateY(4px); box-shadow:0 1px 0 #20140c, inset 0 1px 0 #fff3}
+.key.orange{background:linear-gradient(#ee8444,var(--orange)); box-shadow:0 5px 0 #8a3a10,0 8px 8px #0005,inset 0 1px 0 #fff4}
+.key.orange:active{box-shadow:0 1px 0 #8a3a10}
+.key.red{background:linear-gradient(#cf4a40,var(--red)); box-shadow:0 5px 0 #6b1a15,0 8px 8px #0005,inset 0 1px 0 #fff4}
+.key.red:active{box-shadow:0 1px 0 #6b1a15}
+.key.small{padding:9px 14px}
+
+.prior{background:var(--paper); border:2px dashed #8f8160; border-radius:8px; padding:12px 14px; margin-bottom:14px}
+.prior p{margin:0 0 8px; font-size:14px}
+.prior label{display:inline-block; margin-right:14px; font-size:14px}
+.prior input{width:110px}
+
+.semesters{display:flex; flex-direction:column; gap:16px}
+.sem{
+  background:var(--paper); border-radius:4px 4px 0 0; padding:14px 14px 22px;
+  box-shadow:0 4px 10px #0004;
+  background-image:repeating-linear-gradient(0deg,#0000 0 27px,#d9cfae55 27px 28px);
+  position:relative;
+  clip-path:polygon(0 0,100% 0,100% calc(100% - 10px),97.5% 100%,95% calc(100% - 10px),92.5% 100%,90% calc(100% - 10px),87.5% 100%,85% calc(100% - 10px),82.5% 100%,80% calc(100% - 10px),77.5% 100%,75% calc(100% - 10px),72.5% 100%,70% calc(100% - 10px),67.5% 100%,65% calc(100% - 10px),62.5% 100%,60% calc(100% - 10px),57.5% 100%,55% calc(100% - 10px),52.5% 100%,50% calc(100% - 10px),47.5% 100%,45% calc(100% - 10px),42.5% 100%,40% calc(100% - 10px),37.5% 100%,35% calc(100% - 10px),32.5% 100%,30% calc(100% - 10px),27.5% 100%,25% calc(100% - 10px),22.5% 100%,20% calc(100% - 10px),17.5% 100%,15% calc(100% - 10px),12.5% 100%,10% calc(100% - 10px),7.5% 100%,5% calc(100% - 10px),2.5% 100%,0 calc(100% - 10px));
+}
+.sem-head{display:flex; align-items:center; gap:10px; margin-bottom:8px}
+.sem-name{flex:1; font-family:'Special Elite',monospace; font-size:18px; font-weight:bold; border:none; border-bottom:2px dotted #8f8160; background:transparent; color:var(--ink); min-width:0}
+.sem-sgpa{font-family:'VT323',monospace; font-size:26px; background:var(--lcd-bg); padding:0 8px; border-radius:4px; border:2px solid #5d5640; white-space:nowrap}
+.row{display:grid; grid-template-columns:1fr 70px 90px 30px; gap:8px; margin-bottom:6px; align-items:center}
+.row.labels{font-size:12px; text-transform:uppercase; color:#6b5a44; margin-bottom:2px}
+input,select{
+  font-family:'Special Elite',monospace; font-size:15px; padding:7px 8px; width:100%;
+  border:2px solid #8f8160; border-radius:6px; background:#fffdf4; color:var(--ink);
+}
+input:focus,select:focus{outline:3px solid #d8682a66; border-color:var(--orange)}
+input.bad{border-color:var(--red); background:#fde8e5}
+.icon-btn{border:none; background:transparent; color:var(--red); font-size:20px; cursor:pointer; font-family:inherit}
+.icon-btn:hover{transform:scale(1.25)}
+.sem-actions{display:flex; gap:10px; margin-top:10px}
+.link{border:2px solid var(--brown); background:transparent; color:var(--brown); font-family:inherit; padding:5px 12px; border-radius:6px; cursor:pointer; font-size:14px}
+.link:hover{background:var(--brown); color:var(--cream)}
+.link.danger{border-color:var(--red); color:var(--red)}
+.link.danger:hover{background:var(--red); color:#fff}
+.foot{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:20px; font-size:12px; color:#5b4a36; flex-wrap:wrap}
+
+@media (max-width:560px){
+  .lcd-main{font-size:60px}
+  .keys{grid-template-columns:repeat(2,1fr)}
+  .row{grid-template-columns:1fr 58px 78px 24px}
+  input,select{font-size:14px; padding:6px 4px}
+}
+@media print{
+  body{background:#fff; padding:0}
+  .calc{box-shadow:none; border:none; background:#fff}
+  .keys,.foot,.sem-actions,.icon-btn,.solar,.prior{display:none!important}
+  .sem{clip-path:none; box-shadow:none; border:1px solid #999; break-inside:avoid}
+}
+
+.modal-back{position:fixed; inset:0; background:#000a; display:flex; align-items:center; justify-content:center; z-index:50; padding:20px}
+.modal{background:var(--paper); border:3px solid var(--brown); border-radius:12px; padding:20px; max-width:340px; width:100%; text-align:center; box-shadow:0 20px 40px #000a}
+.modal p{margin:0 0 16px; font-size:16px}
+.modal-btns{display:flex; gap:10px; justify-content:center}
+
+</style>
+</head>
+<body>
+  <main class="calc">
+    <header class="brand">
+      <span class="logo">CGPA-1000</span>
+      <span class="tagline">Academic Grade Computer &middot; Model 1984</span>
+      <div class="solar" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    </header>
+
+    <section class="lcd" aria-live="polite">
+      <div class="lcd-top">
+        <span>CGPA</span>
+        <span id="scaleTag">/ 10</span>
+      </div>
+      <output id="cgpa" class="lcd-main">0.00</output>
+      <div class="lcd-stats">
+        <span>CREDITS <b id="totCredits">0</b></span>
+        <span>% <b id="percent">--</b></span>
+        <span id="classTag">--</span>
+      </div>
+    </section>
+
+    <section class="keys">
+      <button class="key orange" id="addSem">+ SEMESTER</button>
+      <button class="key" id="scaleBtn">SCALE: 10-PT</button>
+      <button class="key" id="priorBtn">PRIOR CGPA</button>
+      <button class="key red" id="clearBtn">ALL CLEAR</button>
+    </section>
+
+    <section id="prior" class="prior" hidden>
+      <p>Already have results from earlier semesters? Enter them here.</p>
+      <label>Prior CGPA <input id="priorCgpa" type="number" min="0" step="0.01" inputmode="decimal"></label>
+      <label>Prior credits <input id="priorCredits" type="number" min="0" step="0.5" inputmode="decimal"></label>
+    </section>
+
+    <section id="semesters" class="semesters"></section>
+
+    <footer class="foot">
+      <button class="key small" id="printBtn">PRINT TAPE</button>
+      <span>Saved automatically in this browser</span>
+    </footer>
+  </main>
+
+  <script>
+(() => {
+  'use strict';
+
+  // ---------- Grade scales ----------
+  const SCALES = {
+    '10': {
+      max: 10, label: '10-PT',
+      grades: [['O',10],['A+',9],['A',8],['B+',7],['B',6],['C',5],['P',4],['F',0]]
+    },
+    '4': {
+      max: 4, label: '4-PT',
+      grades: [['A',4],['A-',3.7],['B+',3.3],['B',3],['B-',2.7],['C+',2.3],['C',2],['D',1],['F',0]]
+    }
+  };
+  const STORE_KEY = 'vintage-cgpa-v1';
+
+  // ---------- State ----------
+  let state = load() || fresh();
+
+  function fresh() {
+    return { scale: '10', priorCgpa: '', priorCredits: '', semesters: [newSem(1)] };
+  }
+  function newCourse() { return { name: '', credits: '', grade: '' }; }
+  function newSem(n) { return { name: 'Semester ' + n, courses: [newCourse(), newCourse(), newCourse()] }; }
+
+  function load() {
+    try {
+      const s = JSON.parse(localStorage.getItem(STORE_KEY));
+      if (s && SCALES[s.scale] && Array.isArray(s.semesters)) return s;
+    } catch (e) {}
+    return null;
+  }
+  function save() {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {}
+  }
+
+  // ---------- Calculation ----------
+  function gradePoint(label) {
+    const g = SCALES[state.scale].grades.find(x => x[0] === label);
+    return g ? g[1] : null;
+  }
+  function semResult(sem) {
+    let credits = 0, points = 0;
+    for (const c of sem.courses) {
+      const cr = parseFloat(c.credits);
+      const gp = gradePoint(c.grade);
+      if (cr > 0 && gp !== null) { credits += cr; points += cr * gp; }
+    }
+    return { credits, points, gpa: credits ? points / credits : null };
+  }
+  function overall() {
+    let credits = 0, points = 0;
+    const pc = parseFloat(state.priorCgpa), pcr = parseFloat(state.priorCredits);
+    if (pc >= 0 && pcr > 0 && pc <= SCALES[state.scale].max) { credits += pcr; points += pc * pcr; }
+    for (const s of state.semesters) {
+      const r = semResult(s);
+      credits += r.credits; points += r.points;
+    }
+    return { credits, cgpa: credits ? points / credits : null };
+  }
+  function classify(cgpa) {
+    const p = cgpa / SCALES[state.scale].max; // normalised 0..1
+    if (p >= 0.85) return 'DISTINCTION';
+    if (p >= 0.75) return 'FIRST CLASS';
+    if (p >= 0.60) return 'SECOND CLASS';
+    if (p >= 0.40) return 'PASS';
+    return 'FAIL';
+  }
+  const round2 = n => (Math.round(n * 100) / 100).toFixed(2);
+
+  // ---------- DOM helpers ----------
+  const $ = id => document.getElementById(id);
+  function el(tag, props = {}, ...kids) {
+    const e = document.createElement(tag);
+    Object.entries(props).forEach(([k, v]) => {
+      if (k === 'class') e.className = v;
+      else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+      else e[k] = v;
+    });
+    kids.forEach(k => e.append(k));
+    return e;
+  }
+
+
+  // ---------- In-page confirm dialog ----------
+  function askConfirm(msg, onYes) {
+    const back = el('div', { class: 'modal-back' });
+    const close = () => back.remove();
+    back.append(el('div', { class: 'modal', role: 'dialog' },
+      el('p', { textContent: msg }),
+      el('div', { class: 'modal-btns' },
+        el('button', { class: 'key small', textContent: 'CANCEL', onclick: close }),
+        el('button', { class: 'key small red', textContent: 'YES', onclick: () => { close(); onYes(); } })
+      )));
+    document.body.append(back);
+  }
+
+  // ---------- Rendering ----------
+  function render() {
+    const sc = SCALES[state.scale];
+    $('scaleBtn').textContent = 'SCALE: ' + sc.label;
+    $('scaleTag').textContent = '/ ' + sc.max;
+    $('priorCgpa').value = state.priorCgpa;
+    $('priorCredits').value = state.priorCredits;
+
+    const wrap = $('semesters');
+    wrap.textContent = '';
+    state.semesters.forEach((sem, si) => wrap.append(renderSem(sem, si)));
+    updateDisplay();
+  }
+
+  function renderSem(sem, si) {
+    const sgpa = el('span', { class: 'sem-sgpa', id: 'sgpa-' + si });
+    const nameIn = el('input', {
+      class: 'sem-name', value: sem.name, maxLength: 30, ariaLabel: 'Semester name',
+      oninput: e => { sem.name = e.target.value; save(); }
+    });
+    const head = el('div', { class: 'sem-head' }, nameIn, sgpa);
+
+    const labels = el('div', { class: 'row labels' },
+      el('span', { textContent: 'Subject' }), el('span', { textContent: 'Credits' }),
+      el('span', { textContent: 'Grade' }), el('span'));
+
+    const rows = el('div');
+    sem.courses.forEach((c, ci) => rows.append(renderCourse(sem, si, c, ci)));
+
+    const actions = el('div', { class: 'sem-actions' },
+      el('button', { class: 'link', textContent: '+ Subject', onclick: () => {
+        sem.courses.push(newCourse()); save(); render();
+      }}),
+      el('button', { class: 'link danger', textContent: 'Remove semester', onclick: () => {
+        if (state.semesters.length === 1) { state.semesters[0] = newSem(1); save(); render(); return; }
+        askConfirm('Remove "' + sem.name + '"?', () => { state.semesters.splice(si, 1); save(); render(); });
+      }})
+    );
+    return el('article', { class: 'sem' }, head, labels, rows, actions);
+  }
+
+  function renderCourse(sem, si, c, ci) {
+    const name = el('input', {
+      placeholder: 'e.g. Calculus', value: c.name, maxLength: 40, ariaLabel: 'Subject name',
+      oninput: e => { c.name = e.target.value; save(); }
+    });
+    const credits = el('input', {
+      type: 'number', min: '0', max: '30', step: '0.5', inputMode: 'decimal',
+      placeholder: 'cr', value: c.credits, ariaLabel: 'Credits',
+      oninput: e => {
+        c.credits = e.target.value;
+        const v = parseFloat(c.credits);
+        e.target.classList.toggle('bad', c.credits !== '' && !(v > 0 && v <= 30));
+        save(); updateDisplay();
+      }
+    });
+    const grade = el('select', {
+      ariaLabel: 'Grade',
+      onchange: e => { c.grade = e.target.value; save(); updateDisplay(); }
+    }, el('option', { value: '', textContent: '--' }));
+    SCALES[state.scale].grades.forEach(([g, p]) => {
+      const o = el('option', { value: g, textContent: g + ' (' + p + ')' });
+      if (c.grade === g) o.selected = true;
+      grade.append(o);
+    });
+    const del = el('button', { class: 'icon-btn', textContent: '×', title: 'Remove subject', ariaLabel: 'Remove subject',
+      onclick: () => {
+        sem.courses.splice(ci, 1);
+        if (!sem.courses.length) sem.courses.push(newCourse());
+        save(); render();
+      }});
+    return el('div', { class: 'row' }, name, credits, grade, del);
+  }
+
+  function updateDisplay() {
+    state.semesters.forEach((s, i) => {
+      const r = semResult(s), t = $('sgpa-' + i);
+      if (t) t.textContent = 'SGPA ' + (r.gpa === null ? '--' : round2(r.gpa));
+    });
+    const o = overall();
+    $('cgpa').textContent = o.cgpa === null ? '0.00' : round2(o.cgpa);
+    $('totCredits').textContent = Number.isInteger(o.credits) ? o.credits : o.credits.toFixed(1);
+    if (o.cgpa === null) {
+      $('percent').textContent = '--';
+      $('classTag').textContent = '--';
+    } else {
+      // Percentage: 9.5 x CGPA is the common Indian (CBSE/VTU-style) conversion; for 4-pt scale use direct ratio.
+      const pct = state.scale === '10' ? o.cgpa * 9.5 : (o.cgpa / 4) * 100;
+      $('percent').textContent = Math.min(100, pct).toFixed(1);
+      $('classTag').textContent = classify(o.cgpa);
+    }
+  }
+
+  // ---------- Events ----------
+  $('addSem').addEventListener('click', () => {
+    state.semesters.push(newSem(state.semesters.length + 1));
+    save(); render();
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  });
+
+  $('scaleBtn').addEventListener('click', () => {
+    state.scale = state.scale === '10' ? '4' : '10';
+    // grades from the old scale are no longer valid
+    state.semesters.forEach(s => s.courses.forEach(c => { c.grade = ''; }));
+    state.priorCgpa = '';
+    save(); render();
+  });
+
+  $('priorBtn').addEventListener('click', () => { $('prior').hidden = !$('prior').hidden; });
+  $('priorCgpa').addEventListener('input', e => { state.priorCgpa = e.target.value; save(); updateDisplay(); });
+  $('priorCredits').addEventListener('input', e => { state.priorCredits = e.target.value; save(); updateDisplay(); });
+
+  $('clearBtn').addEventListener('click', () => {
+    askConfirm('Clear everything and start over?', () => { state = fresh(); save(); render(); });
+  });
+
+  $('printBtn').addEventListener('click', () => { try { window.print(); } catch (e) {} });
+
+  if (state.priorCgpa || state.priorCredits) $('prior').hidden = false;
+  render();
+})();
+
+</script>
+</body>
+</html>
